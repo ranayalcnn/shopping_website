@@ -1,30 +1,104 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
+import { FiShoppingCart } from 'react-icons/fi';
+import { toast } from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
+  const [liked, setLiked] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
+
+  const localKey = 'favorites';
+
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem(localKey)) || [];
+    if (saved.includes(product.id)) {
+      setLiked(true);
+    }
+  }, [product.id]);
+
+  const handleFavorite = () => {
+    const saved = JSON.parse(localStorage.getItem(localKey)) || [];
+    let updated;
+
+    if (!liked) {
+      updated = [...saved, product.id];
+      toast.success(`${product.name} favorilere eklendi!`);
+    } else {
+      updated = saved.filter((id) => id !== product.id);
+      toast.error(`${product.name} favorilerden çıkarıldı.`);
+    }
+
+    localStorage.setItem(localKey, JSON.stringify(updated));
+    setLiked(!liked);
+  };
+
+  const handleAddToCart = () => {
+    toast.success(`${product.name} sepete eklendi!`);
+    setIsClicked(true);
+    setTimeout(() => setIsClicked(false), 500);
+  };
+
   if (!product) return null;
 
-  console.log("🟩 Kart verisi:", product);
-
   return (
-    <div className="flex flex-col items-center border rounded-2xl p-4 shadow-md hover:shadow-xl transition duration-300 ease-in-out transform hover:scale-105 bg-white">
-      <img
-        src={
-          product.image && product.image.startsWith('http')
-            ? product.image
-            : 'https://via.placeholder.com/300x300.png?text=No+Image'
-        }
-        alt={product.name || 'Ürün'}
-        className="w-full h-64 object-cover rounded-md mb-4"
-      />
-      <h2 className="text-xl font-semibold text-center text-gray-800">
-        {product.name || 'Ürün Adı Yok'}
-      </h2>
-      <p className="text-green-600 font-bold mt-1">
-        {product.price !== undefined ? `${product.price} ₺` : 'Fiyat Bilinmiyor'}
-      </p>
-      <p className="text-sm mt-2 text-gray-600 text-center">
-        {product.description || 'Açıklama yok.'}
-      </p>
+    <div className="relative bg-white w-full max-w-[280px] rounded-xl overflow-hidden shadow hover:shadow-lg transition-transform transform hover:scale-[1.03] group mx-auto">
+
+      {/* Favori Butonu */}
+      <button
+        onClick={handleFavorite}
+        className={`absolute top-3 right-3 z-10 text-3xl transition-transform transform ${
+          liked ? 'text-red-500 scale-110' : 'text-gray-300 hover:text-red-400 hover:scale-105'
+        }`}
+      >
+        {liked ? <AiFillHeart /> : <AiOutlineHeart />}
+      </button>
+
+      {/* Ürün Görseli */}
+      <div className="overflow-hidden">
+        <img
+          src={
+            product.image?.startsWith('http')
+              ? product.image
+              : 'https://via.placeholder.com/300x300.png?text=No+Image'
+          }
+          alt={product.name || 'Ürün'}
+          className="w-full h-60 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105"
+        />
+      </div>
+
+      {/* Ürün Bilgileri */}
+      <div className="p-4 flex flex-col justify-between h-[200px]">
+        <div>
+          <h2 className="text-base font-semibold text-gray-800 truncate">
+            {product.name || 'Ürün Adı Yok'}
+          </h2>
+          <p className="text-sm text-green-600 font-bold mt-1">
+            {product.price !== undefined ? `${product.price} ₺` : 'Fiyat Bilinmiyor'}
+          </p>
+          <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+            {product.description || 'Açıklama yok.'}
+          </p>
+
+          {product.rating && (
+            <div className="mt-2 text-yellow-500 text-sm">
+              {'★'.repeat(Math.round(product.rating))}{' '}
+              <span className="text-gray-400">{product.rating.toFixed(1)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Sepet Butonu */}
+        <button
+          onClick={handleAddToCart}
+          className={`mt-4 self-end w-11 h-11 flex items-center justify-center rounded-full
+            bg-gradient-to-br from-primary to-secondary text-white text-xl shadow-md
+            hover:scale-110 hover:shadow-lg transition-all duration-300 ease-out
+            ${isClicked ? 'animate-bounce' : ''}`}
+          title="Sepete Ekle"
+        >
+          <FiShoppingCart />
+        </button>
+      </div>
     </div>
   );
 };

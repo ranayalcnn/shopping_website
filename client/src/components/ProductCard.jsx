@@ -3,6 +3,14 @@ import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { FiShoppingCart } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 
+// Rastgele resim çekme fonksiyonu
+// product.id'yi kullanarak her ürüne sabit ama farklı bir resim çekmeyi garantileriz.
+const getRandomImage = (id) => {
+    // 300x300 boyutunda rastgele resim çekilir. 
+    // ?random=ID, her ID için aynı resmin gelmesini sağlar (kalıcılık).
+    return `https://picsum.photos/300/300?random=${id}`;
+};
+
 const ProductCard = ({ product }) => {
   const [liked, setLiked] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
@@ -41,13 +49,15 @@ const ProductCard = ({ product }) => {
   if (!product) return null;
 
   return (
-    <div className="relative bg-white w-full max-w-[280px] rounded-xl overflow-hidden shadow hover:shadow-lg transition-transform transform hover:scale-[1.03] group mx-auto">
+    <div className="relative bg-card dark:bg-dark-card w-full max-w-[280px] rounded-xl overflow-hidden shadow-lg dark:shadow-2xl hover:shadow-xl transition-transform transform hover:scale-[1.03] group mx-auto">
 
       {/* Favori Butonu */}
       <button
         onClick={handleFavorite}
         className={`absolute top-3 right-3 z-10 text-3xl transition-transform transform ${
-          liked ? 'text-red-500 scale-110' : 'text-gray-300 hover:text-red-400 hover:scale-105'
+          liked 
+            ? 'text-red-500 scale-110 dark:text-red-400' 
+            : 'text-gray-300 hover:text-red-400 hover:scale-105 dark:text-gray-500 dark:hover:text-red-400'
         }`}
       >
         {liked ? <AiFillHeart /> : <AiOutlineHeart />}
@@ -56,10 +66,11 @@ const ProductCard = ({ product }) => {
       {/* Ürün Görseli */}
       <div className="overflow-hidden">
         <img
+          // BÜYÜK DEĞİŞİKLİK: Eğer ürün.image tanımlı değilse veya geçersizse, rastgele resim çekilir.
           src={
             product.image?.startsWith('http')
               ? product.image
-              : 'https://via.placeholder.com/300x300.png?text=No+Image'
+              : getRandomImage(product.id) // product.id'yi kullanarak her ürüne farklı resim sağlar
           }
           alt={product.name || 'Ürün'}
           className="w-full h-60 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105"
@@ -69,20 +80,26 @@ const ProductCard = ({ product }) => {
       {/* Ürün Bilgileri */}
       <div className="p-4 flex flex-col justify-between h-[200px]">
         <div>
-          <h2 className="text-base font-semibold text-gray-800 truncate">
+          {/* Başlık Metni Rengi */}
+          <h2 className="text-base font-semibold text-heading dark:text-dark-heading truncate">
             {product.name || 'Ürün Adı Yok'}
           </h2>
-          <p className="text-sm text-green-600 font-bold mt-1">
+          
+          {/* Fiyat Rengi */}
+          <p className="text-sm text-green-600 dark:text-green-400 font-bold mt-1">
             {product.price !== undefined ? `${product.price} ₺` : 'Fiyat Bilinmiyor'}
           </p>
-          <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+          
+          {/* Açıklama Metni Rengi */}
+          <p className="text-xs text-text dark:text-dark-text mt-1 line-clamp-2">
             {product.description || 'Açıklama yok.'}
           </p>
 
           {product.rating && (
-            <div className="mt-2 text-yellow-500 text-sm">
+            // Rating yıldızları rengi
+            <div className="mt-2 text-yellow-500 dark:text-yellow-400 text-sm">
               {'★'.repeat(Math.round(product.rating))}{' '}
-              <span className="text-gray-400">{product.rating.toFixed(1)}</span>
+              <span className="text-gray-400 dark:text-gray-500">{product.rating.toFixed(1)}</span>
             </div>
           )}
         </div>
@@ -91,7 +108,7 @@ const ProductCard = ({ product }) => {
         <button
           onClick={handleAddToCart}
           className={`mt-4 self-end w-11 h-11 flex items-center justify-center rounded-full
-            bg-gradient-to-br from-primary to-secondary text-white text-xl shadow-md
+            bg-primary text-white text-xl shadow-md
             hover:scale-110 hover:shadow-lg transition-all duration-300 ease-out
             ${isClicked ? 'animate-bounce' : ''}`}
           title="Sepete Ekle"

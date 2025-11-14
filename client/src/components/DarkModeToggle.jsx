@@ -9,7 +9,7 @@ const DarkModeToggle = () => {
     return (
         <button
             onClick={toggleTheme}
-            title={themeMode === 'light' ? 'Karanlık Moda Geç' : 'Aydınlık Moda Geç'}
+            title={themeMode === 'light' ? 'Change to Bright Mode' : 'Change to Dark Mode'}
             className="p-2 rounded-full hover:bg-white/20 transition-colors"
         >
             {/* Geçerli moda göre ikon göster */}

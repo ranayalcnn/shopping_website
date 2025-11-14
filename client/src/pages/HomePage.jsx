@@ -1,120 +1,159 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { fetchProducts } from '../api/productAPI';
 import ProductCard from '../components/ProductCard';
-// 🚨 KALDIRILDI: SearchBar bileşeni artık Navbar içinde.
-// import SearchBar from '../components/SearchBar'; 
-// Düzeltilmiş import yolu
-import AnimatedWrapper from '../components/AnimatedWrapper'; 
+import AnimatedWrapper from '../components/AnimatedWrapper';
+import FilterBar from '../components/FilterBar';
 
 const HomePage = () => {
-    const [products, setProducts] = useState([]);
-    // 🚨 KALDIRILDI: Arama çubuğu (SearchBar) Navbar'a taşındığı için searchTerm state'i kaldırıldı.
-    // const [searchTerm, setSearchTerm] = useState('');
-    const [error, setError] = useState('');
+  const [allProducts, setAllProducts] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState('');
+  const [category, setCategory] = useState('all');
+  const [sortOption, setSortOption] = useState('default');
 
-    // 🚨 NOT: Arama filtresi, eğer arama işlevini Navbar'da tutuyorsanız, 
-    // bu sayfada da kullanmak için Navbar'dan gelen bir prop'a (veya Global State'e) ihtiyaç duyar.
-    // Şimdilik filtreleme mekanizmasını basitleştirip, tüm ürünleri gösterelim.
-    // Eğer filtreleme isteniyorsa, `searchTerm`'ün merkezi bir state yönetiminden (Redux/Context) gelmesi gerekir.
+  // Ürünleri yükle
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const data = await fetchProducts();
+        setAllProducts(data);
+        setProducts(data.slice(0, 4)); // ilk 4 ürün
+      } catch (err) {
+        console.error('❌ Ürünleri alırken hata:', err);
+        setError('Ürünler yüklenemedi.');
+      }
+    };
+    loadProducts();
+  }, []);
 
-    useEffect(() => {
-        const loadProducts = async () => {
-            try {
-                const data = await fetchProducts();
-                setProducts(data);
-            } catch (err) {
-                console.error('❌ Ürünleri alırken hata:', err);
-                setError('Ürünler yüklenemedi.');
-            }
-        };
-        loadProducts();
-    }, []);
+  // 4 ürünü rastgele seç
+  const shuffleProducts = () => {
+    if (allProducts.length === 0) return;
+    const shuffled = [...allProducts].sort(() => 0.5 - Math.random()).slice(0, 4);
+    setProducts(shuffled);
+  };
 
-    // 🚨 DEĞİŞİKLİK: Filtreleme kaldırıldığı için tüm ürünler gösterilir.
-    // Eğer filtreleme global olarak yönetilseydi, bu kısım şöyle olurdu:
-    // const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(globalSearchTerm.toLowerCase()));
-    const filteredProducts = products;
+  // Kategoriler
+  const categories = useMemo(() => {
+    const unique = [...new Set(allProducts.map((p) => p.category || 'Genel'))];
+    return ['all', ...unique];
+  }, [allProducts]);
 
+  // Filtre + sıralama
+  const filteredProducts = useMemo(() => {
+    let filtered = [...products];
 
-    return (
-        // DARK MODE UYUMLULUĞU: Genel arka plan ve metin renkleri
-        <div className="bg-background text-text dark:bg-dark-background dark:text-dark-text min-h-screen font-sans">
-            
-            {/* Hero Alanı */}
-            <section className="bg-primary text-white py-20 text-center px-4">
-                
-                {/* Başlık için animasyon */}
-                <AnimatedWrapper delay={0.1} className="inline-block">
-                    <h1 className="text-5xl font-extrabold mb-4">
-                        Tarzını Yansıt
-                    </h1>
-                </AnimatedWrapper>
+    if (category !== 'all') {
+      filtered = filtered.filter((p) => (p.category || 'Genel') === category);
+    }
+    if (sortOption === 'price-asc') {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sortOption === 'price-desc') {
+      filtered.sort((a, b) => b.price - a.price);
+    } else if (sortOption === 'name') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    }
 
-                {/* Paragraf ve Buton için farklı gecikmelerle animasyon */}
-                <AnimatedWrapper delay={0.3}>
-                    <p className="text-lg mb-6">
-                        En yeni ve havalı T-Shirt modelleri burada!
-                    </p>
-                </AnimatedWrapper>
+    return filtered;
+  }, [products, category, sortOption]);
 
-                <AnimatedWrapper delay={0.5}>
-                    <button
-                        // 🚨 KRİTİK DEĞİŞİKLİK: Hero Butonunun Dark Mode Uyumu
-                        // Dark Mode'da arka planı dark-background ve metni primary yapalım.
-                        className="bg-white text-primary px-6 py-3 rounded-full font-semibold shadow 
-                                   hover:bg-gray-100 transition 
-                                   dark:bg-dark-background dark:text-dark-primary dark:hover:bg-gray-800"
-                    >
-                        Alışverişe Başla
-                    </button>
-                </AnimatedWrapper>
-            </section>
-            
-            {/* 🚨 KALDIRILDI: SearchBar bileşeni bu kısımdan tamamen çıkarıldı. */}
-            {/* <AnimatedWrapper delay={0.7}>
-                <SearchBar value={searchTerm} onChange={setSearchTerm} />
-            </AnimatedWrapper> */}
+  return (
+    <div className="min-h-screen font-sans transition-colors duration-300
+                    bg-slate-50 text-slate-900
+                    dark:bg-slate-950 dark:text-slate-100">
 
+      {/* Hero */}
+      <section className="text-white py-20 text-center px-4 shadow-lg
+                          bg-gradient-to-r from-slate-800 to-slate-900
+                          dark:from-slate-900 dark:to-slate-950">
+        <AnimatedWrapper delay={0.1} className="inline-block">
+          <h1 className="text-5xl font-extrabold mb-4 tracking-tight">
+            Tarzını Yansıt
+          </h1>
+        </AnimatedWrapper>
 
-            {/* Ürünler Bölümü */}
-            <section className="px-4 py-12">
-                <div className="mx-auto w-full max-w-[1280px]">
-                    
-                    {/* Ürünler Başlığı için animasyon */}
-                    <AnimatedWrapper delay={0.1}>
-                        {/* 🚨 DEĞİŞİKLİK: Başlık Dark Mode Uyumu */}
-                        <h2 className="text-3xl font-bold text-center text-primary dark:text-dark-primary mb-8">
-                            Öne Çıkan Ürünler
-                        </h2>
-                    </AnimatedWrapper>
+        <AnimatedWrapper delay={0.3}>
+          <p className="text-lg mb-6 opacity-90">
+            En yeni ve havalı ürünler burada!
+          </p>
+        </AnimatedWrapper>
 
-                    {error && <p className="text-center text-red-500">{error}</p>}
-                    
-                    {/* 🚨 DEĞİŞİKLİK: Ürün Listesi Kapsayıcılarının Dark Mode Uyumu */}
-                    <div className="rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg dark:shadow-2xl">
-                        <div className="rounded-2xl bg-white dark:bg-gray-800 p-6"> {/* bg-card/dark-card yerine daha net renkler */}
-                            {filteredProducts.length === 0 && !error ? (
-                                <p className="text-center text-gray-500 dark:text-gray-400">Aradığınız ürün bulunamadı.</p>
-                            ) : (
-                                <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(240px,1fr))]">
-                                    {filteredProducts.map((product, index) => (
-                                        <AnimatedWrapper 
-                                            key={product._id || product.id || index} 
-                                            delay={index * 0.1} 
-                                        >
-                                            <ProductCard
-                                                product={product}
-                                            />
-                                        </AnimatedWrapper>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <AnimatedWrapper delay={0.5}>
+          <button
+            className="rounded-full px-6 py-3 font-semibold shadow
+                       bg-white text-emerald-700 hover:bg-slate-50
+                       dark:bg-slate-900 dark:text-emerald-300 dark:hover:bg-slate-800
+                       focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 transition"
+          >
+            Alışverişe Başla
+          </button>
+        </AnimatedWrapper>
+      </section>
+
+      {/* Ürünler */}
+      <section className="px-4 py-12">
+        <div className="mx-auto w-full max-w-[1280px]">
+          <AnimatedWrapper delay={0.1}>
+            <h2 className="text-center text-3xl font-bold mb-3 tracking-tight
+                           text-slate-800 dark:text-slate-100">
+              TRENDING
+            </h2>
+          </AnimatedWrapper>
+
+          {/* ince vurgu çizgisi */}
+          <div className="mx-auto mb-8 h-1 w-24 rounded-full
+                          bg-emerald-600 dark:bg-emerald-400"></div>
+
+          {/* Filtre bar (ayrı component) */}
+          <FilterBar
+            categories={categories}
+            category={category}
+            setCategory={setCategory}
+            sortOption={sortOption}
+            setSortOption={setSortOption}
+          />
+
+          <div className="rounded-2xl border shadow-xl transition-colors duration-300
+                          border-slate-200 dark:border-slate-800">
+            <div className="rounded-2xl p-6
+                            bg-white dark:bg-slate-900">
+
+              {error && <p className="text-center text-red-500">{error}</p>}
+
+              {/* Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 items-stretch mb-10">
+                {filteredProducts.map((product, index) => (
+                  <AnimatedWrapper
+                    key={product._id || product.id || index}
+                    delay={index * 0.1}
+                    className="h-full flex"
+                  >
+                    <ProductCard product={product} />
+                  </AnimatedWrapper>
+                ))}
+              </div>
+
+              {/* Ürünleri Değiştir */}
+              <div className="flex justify-center">
+                <button
+                  onClick={shuffleProducts}
+                  className="rounded-full px-8 py-3 font-semibold shadow-lg
+                             text-white
+                             bg-emerald-600 hover:bg-emerald-700
+                             dark:bg-emerald-500 dark:hover:bg-emerald-400
+                             focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400
+                             transition"
+                >
+                  Ürünleri Değiştir
+                </button>
+              </div>
+
+            </div>
+          </div>
         </div>
-    );
+      </section>
+    </div>
+  );
 };
 
 export default HomePage;

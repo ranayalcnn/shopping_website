@@ -1,155 +1,160 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { FiShoppingCart } from 'react-icons/fi';
-import { toast } from 'react-hot-toast'; // Toast bildirimleri için
+import { toast } from 'react-hot-toast';
 
-// İki sabit rastgele resim URL'si oluşturmak için yardımcı fonksiyon (Değişiklik yok)
-const createPlaceholderUrls = (id) => ({
-    main: `https://picsum.photos/300/300?random=${id}`,
-    hover: `https://picsum.photos/300/300?random=${id + 1}`, 
-});
+const createPlaceholderUrls = (id) => {
+  const size = 300;
+  return {
+    main: `https://placehold.co/${size}x${size}/334155/e2e8f0?text=Product+${id}`, // slate700 / slate100
+    hover: `https://placehold.co/${size}x${size}/e2e8f0/065f46?text=View`,        // slate100 / emerald800
+  };
+};
 
 const ProductCard = ({ product }) => {
-    const [liked, setLiked] = useState(false);
-    const [isClicked, setIsClicked] = useState(false);
-    const localKey = 'favorites';
-    
-    // Rastgele resim URL'lerini useMemo ile hesapla (Değişiklik yok)
-    const imagePlaceholderUrls = useMemo(() => {
-        return createPlaceholderUrls(product.id || Math.random());
-    }, [product.id]);
+  const [liked, setLiked] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
+  const localKey = 'favorites';
 
-    // Favori durumu kontrolü (Değişiklik yok)
-    useEffect(() => {
-        const saved = JSON.parse(localStorage.getItem(localKey)) || [];
-        if (saved.includes(product.id)) {
-            setLiked(true);
-        }
-    }, [product.id]);
+  const imagePlaceholderUrls = useMemo(() => {
+    return createPlaceholderUrls(product?.id || Math.random());
+  }, [product?.id]);
 
-    // Favori butonu işleyicisi (Değişiklik yok)
-    const handleFavorite = () => {
-        const saved = JSON.parse(localStorage.getItem(localKey)) || [];
-        let updated;
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem(localKey)) || [];
+    if (product?.id && saved.includes(product.id)) setLiked(true);
+  }, [product?.id]);
 
-        if (!liked) {
-            updated = [...saved, product.id];
-            toast.success(`${product.name} favorilere eklendi!`);
-        } else {
-            updated = saved.filter((id) => id !== product.id);
-            toast.error(`${product.name} favorilerden çıkarıldı.`);
-        }
+  const handleFavorite = () => {
+    if (!product) return;
+    const saved = JSON.parse(localStorage.getItem(localKey)) || [];
+    let updated;
+    if (!liked) {
+      updated = [...saved, product.id];
+      toast.success(`${product.name} favorilere eklendi!`);
+    } else {
+      updated = saved.filter((id) => id !== product.id);
+      toast.error(`${product.name} favorilerden çıkarıldı.`);
+    }
+    localStorage.setItem(localKey, JSON.stringify(updated));
+    setLiked(!liked);
+  };
 
-        localStorage.setItem(localKey, JSON.stringify(updated));
-        setLiked(!liked);
-    };
+  const handleAddToCart = () => {
+    if (!product) return;
+    toast.success(`${product.name} sepete eklendi!`);
+    setIsClicked(true);
+    setTimeout(() => setIsClicked(false), 450);
+  };
 
-    // Sepete Ekle butonu işleyicisi (Değişiklik yok)
-    const handleAddToCart = () => {
-        toast.success(`${product.name} sepete eklendi!`);
-        setIsClicked(true);
-        setTimeout(() => setIsClicked(false), 500); 
-    };
+  if (!product) return null;
 
-    if (!product) return null;
+  const mainImageUrl =
+    product.image && (product.image.startsWith('http') || product.image.startsWith('/'))
+      ? product.image
+      : imagePlaceholderUrls.main;
 
-    // Resim URL'lerini belirle (Değişiklik yok)
-    const mainImageUrl = product.image && product.image.startsWith('http') 
-        ? product.image 
-        : imagePlaceholderUrls.main;
-        
-    const hoverImageUrl = product.hoverImage && product.hoverImage.startsWith('http') 
-        ? product.hoverImage 
-        : imagePlaceholderUrls.hover;
+  const hoverImageUrl =
+    product.hoverImage && (product.hoverImage.startsWith('http') || product.hoverImage.startsWith('/'))
+      ? product.hoverImage
+      : imagePlaceholderUrls.hover;
 
-    return (
-        // 🚨 KRİTİK: Kartın Genel Tasarımı ve Dark Mode Uyumu
-        // Daha keskin gölge, hover'da daha belirgin yükselme, beyaz/koyu gri arkaplan.
-        <div className="relative bg-white dark:bg-gray-800 w-full max-w-[280px] rounded-xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.03] group mx-auto cursor-pointer">
+  return (
+    <div
+      className="group h-full flex flex-col w-full sm:w-[260px]
+                 rounded-xl overflow-hidden
+                 bg-white border border-slate-200 shadow-sm
+                 hover:border-emerald-200/70 hover:shadow-md
+                 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-emerald-700/40
+                 transition-all duration-300"
+    >
+      {/* Favori */}
+      <button
+        onClick={handleFavorite}
+        className={`absolute z-10 m-3 self-end p-2 rounded-full
+                    bg-white/85 text-slate-600 shadow
+                    hover:scale-105 active:scale-95
+                    dark:bg-slate-900/85 dark:text-slate-200
+                    transition
+                    ${liked ? 'text-emerald-600 dark:text-emerald-400' : ''}`}
+        title={liked ? 'Favorilerde' : 'Favorilere ekle'}
+      >
+        {liked ? <AiFillHeart className="text-xl" /> : <AiOutlineHeart className="text-xl" />}
+      </button>
 
-            {/* Favori Butonu */}
-            <button
-              onClick={(e) => { e.stopPropagation(); handleFavorite(); }} // Tıklamayı karttan ayırır
-              // 🚨 GÜNCELLEME: Şeffaf arka plan, beyaz/koyu gri buton rengi
-              className={`absolute top-3 right-3 z-10 p-2 rounded-full bg-white/70 backdrop-blur-sm shadow-md transition-all duration-300 transform ${
-                liked 
-                  ? 'text-red-500 scale-110' 
-                  : 'text-gray-500 hover:text-red-500 hover:scale-105'
-              } dark:bg-gray-900/70`}
+      {/* Görsel */}
+      <Link to={`/product/${product.id}`} className="relative w-full aspect-[1/1] overflow-hidden">
+        <img
+          src={mainImageUrl}
+          alt={product.name}
+          className="w-full h-full object-cover transition duration-500 group-hover:scale-[1.04] group-hover:opacity-0"
+        />
+        <img
+          src={hoverImageUrl}
+          alt={`${product.name} hover`}
+          className="absolute inset-0 w-full h-full object-cover opacity-0 transition duration-500 group-hover:opacity-100 group-hover:scale-[1.04]"
+        />
+      </Link>
+
+      {/* Bilgi */}
+      <div className="p-4 flex flex-col gap-2 flex-1">
+        <Link to={`/product/${product.id}`}>
+          <h3
+            className="text-base font-semibold tracking-tight
+                       text-slate-900 hover:text-emerald-700
+                       dark:text-slate-100 dark:hover:text-emerald-400
+                       transition line-clamp-1"
+            title={product.name}
+          >
+            {product.name || 'Ürün Adı Yok'}
+          </h3>
+        </Link>
+
+        <div className="flex items-center justify-between">
+          <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
+            {typeof product.price === 'number' ? `${product.price.toFixed(2)} ₺` : 'Fiyat Yok'}
+          </p>
+
+          {product.rating ? (
+            <div
+              className="text-sm flex items-center text-amber-600 dark:text-amber-400"
+              aria-label={`Puan ${product.rating.toFixed(1)}`}
+              title={`Puan: ${product.rating.toFixed(1)}`}
             >
-              {liked ? <AiFillHeart className="text-xl" /> : <AiOutlineHeart className="text-xl" />}
-            </button>
-
-            {/* Ürün Görsel Alanı */}
-            <div className="w-full h-60 overflow-hidden relative">
-                
-                {/* 1. Ana Resim */}
-                <img
-                    src={mainImageUrl}
-                    alt={`${product.name} (Ana)`}
-                    // Yavaş geçiş ve hafif zoom efekti
-                    className="absolute inset-0 w-full h-full object-cover rounded-t-xl transition-all duration-700 group-hover:opacity-0 group-hover:scale-105"
-                />
-
-                {/* 2. Hover Resim */}
-                <img
-                    src={hoverImageUrl}
-                    alt={`${product.name} (Hover)`}
-                    // Yavaş geçiş ve hafif zoom efekti
-                    className="absolute inset-0 w-full h-full object-cover rounded-t-xl transition-all duration-700 opacity-0 group-hover:opacity-100 group-hover:scale-105"
-                />
+              {'★'.repeat(Math.round(product.rating))}
+              <span className="ml-1 text-slate-500 dark:text-slate-400 text-xs">
+                ({product.rating.toFixed(1)})
+              </span>
             </div>
-
-            {/* Ürün Bilgileri ve Aksiyonlar */}
-            <div className="p-4 flex flex-col justify-between h-[180px]">
-                <div>
-                    {/* 🚨 GÜNCELLEME: Başlık Metni Rengi */}
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate mb-1">
-                        {product.name || 'Ürün Adı Yok'}
-                    </h2>
-                    
-                    {/* Fiyat ve Rating Aynı Satırda */}
-                    <div className="flex justify-between items-center mb-2">
-                        {/* 🚨 GÜNCELLEME: Fiyat Rengi (Daha canlı bir primary renk) */}
-                        <p className="text-base text-primary dark:text-indigo-400 font-extrabold"> 
-                            {product.price !== undefined ? `${product.price.toFixed(2)} ₺` : 'Fiyat Bilinmiyor'}
-                        </p>
-                        
-                        {product.rating && (
-                            // Rating yıldızları rengi
-                            <div className="text-yellow-500 dark:text-yellow-400 text-sm flex items-center">
-                                {'★'.repeat(Math.round(product.rating))}
-                                <span className="ml-1 text-gray-500 dark:text-gray-400 text-xs">
-                                    ({product.rating.toFixed(1)})
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                    
-                    {/* 🚨 GÜNCELLEME: Açıklama Metni Rengi */}
-                    <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-                        {product.description || 'Bu ürün hakkında kısa bir açıklama yok.'}
-                    </p>
-                </div>
-
-                {/* Sepet Butonu Kapsayıcısı */}
-                <div className='mt-3 flex justify-end'>
-                    <button
-                        onClick={(e) => { e.stopPropagation(); handleAddToCart(); }} // Tıklamayı karttan ayırır
-                        // 🚨 GÜNCELLEME: Daha düzgün bir buton görünümü ve Dark Mode uyumu
-                        className={`w-10 h-10 flex items-center justify-center rounded-full
-                            bg-primary text-white text-xl shadow-lg
-                            hover:bg-primary/90 hover:scale-110 transition-all duration-300 ease-out
-                            dark:bg-indigo-600 dark:hover:bg-indigo-500
-                            ${isClicked ? 'animate-bounce' : ''}`}
-                        title="Sepete Ekle"
-                    >
-                        <FiShoppingCart />
-                    </button>
-                </div>
-            </div>
+          ) : (
+            <span className="text-xs text-slate-400 dark:text-slate-500">Puan yok</span>
+          )}
         </div>
-    );
+
+        <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
+          {product.description || 'Bu ürün hakkında kısa bir açıklama yok.'}
+        </p>
+
+        {/* Sepete Ekle */}
+        <div className="mt-auto pt-2 flex justify-end">
+          <button
+            onClick={handleAddToCart}
+            className={`w-10 h-10 rounded-full flex items-center justify-center
+                        bg-emerald-600 text-white shadow
+                        hover:bg-emerald-700 active:scale-95
+                        focus:outline-none focus:ring-2 focus:ring-emerald-500
+                        dark:bg-emerald-500 dark:hover:bg-emerald-400
+                        transition ${isClicked ? 'animate-bounce' : ''}`}
+            title="Sepete Ekle"
+            aria-label="Sepete Ekle"
+          >
+            <FiShoppingCart className="text-lg" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ProductCard;

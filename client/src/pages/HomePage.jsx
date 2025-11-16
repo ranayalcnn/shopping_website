@@ -1,157 +1,236 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { fetchProducts } from '../api/productAPI';
-import ProductCard from '../components/ProductCard';
-import AnimatedWrapper from '../components/AnimatedWrapper';
-import FilterBar from '../components/FilterBar';
+import React, { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { fetchProducts } from "../api/productAPI";
+import ProductCard from "../components/ProductCard";
+import EffectWrapper from "../components/EffectWrapper";
+import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import InfoSection from "../components/InfoSection"; // ⭐ YENİ EKLENDİ
 
 const HomePage = () => {
   const [allProducts, setAllProducts] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [error, setError] = useState('');
-  const [category, setCategory] = useState('all');
-  const [sortOption, setSortOption] = useState('default');
+  const [startIndex, setStartIndex] = useState(0);
 
-  // Ürünleri yükle
+  const itemsPerPage = 4;
+
   useEffect(() => {
-    const loadProducts = async () => {
+    const load = async () => {
       try {
         const data = await fetchProducts();
         setAllProducts(data);
-        setProducts(data.slice(0, 4)); // ilk 4 ürün
       } catch (err) {
-        console.error('❌ Ürünleri alırken hata:', err);
-        setError('Ürünler yüklenemedi.');
+        console.error("Error:", err);
       }
     };
-    loadProducts();
+    load();
   }, []);
 
-  // 4 ürünü rastgele seç
-  const shuffleProducts = () => {
-    if (allProducts.length === 0) return;
-    const shuffled = [...allProducts].sort(() => 0.5 - Math.random()).slice(0, 4);
-    setProducts(shuffled);
-  };
+  const paginatedProducts = useMemo(() => {
+    if (allProducts.length === 0) return [];
+    let end = startIndex + itemsPerPage;
 
-  // Kategoriler
-  const categories = useMemo(() => {
-    const unique = [...new Set(allProducts.map((p) => p.category || 'Genel'))];
-    return ['all', ...unique];
-  }, [allProducts]);
-
-  // Filtre + sıralama
-  const filteredProducts = useMemo(() => {
-    let filtered = [...products];
-
-    if (category !== 'all') {
-      filtered = filtered.filter((p) => (p.category || 'Genel') === category);
+    if (end > allProducts.length) {
+      return [
+        ...allProducts.slice(startIndex),
+        ...allProducts.slice(0, end - allProducts.length),
+      ];
     }
-    if (sortOption === 'price-asc') {
-      filtered.sort((a, b) => a.price - b.price);
-    } else if (sortOption === 'price-desc') {
-      filtered.sort((a, b) => b.price - a.price);
-    } else if (sortOption === 'name') {
-      filtered.sort((a, b) => a.name.localeCompare(b.name));
-    }
+    return allProducts.slice(startIndex, end);
+  }, [allProducts, startIndex]);
 
-    return filtered;
-  }, [products, category, sortOption]);
+  const next = () =>
+    setStartIndex((prev) => (prev + itemsPerPage) % allProducts.length);
+
+  const prev = () =>
+    setStartIndex((prev) =>
+      prev - itemsPerPage < 0
+        ? allProducts.length - itemsPerPage
+        : prev - itemsPerPage
+    );
 
   return (
-    <div className="min-h-screen font-sans transition-colors duration-300
-                    bg-slate-50 text-slate-900
-                    dark:bg-slate-950 dark:text-slate-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
 
-      {/* Hero */}
-      <section className="text-white py-20 text-center px-4 shadow-lg
-                          bg-gradient-to-r from-slate-800 to-slate-900
-                          dark:from-slate-900 dark:to-slate-950">
-        <AnimatedWrapper delay={0.1} className="inline-block">
-          <h1 className="text-5xl font-extrabold mb-4 tracking-tight">
-            Tarzını Yansıt
-          </h1>
-        </AnimatedWrapper>
+      {/* ============================== */}
+      {/* HERO */}
+      {/* ============================== */}
+      <section className="relative h-[70vh] w-full overflow-hidden shadow-xl flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900" />
 
-        <AnimatedWrapper delay={0.3}>
-          <p className="text-lg mb-6 opacity-90">
-            En yeni ve havalı ürünler burada!
-          </p>
-        </AnimatedWrapper>
+        <motion.img
+          src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1600"
+          initial={{ scale: 1.05 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 6, ease: "easeOut" }}
+          className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay"
+        />
 
-        <AnimatedWrapper delay={0.5}>
-          <button
-            className="rounded-full px-6 py-3 font-semibold shadow
-                       bg-white text-emerald-700 hover:bg-slate-50
-                       dark:bg-slate-900 dark:text-emerald-300 dark:hover:bg-slate-800
-                       focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 transition"
-          >
-            Alışverişe Başla
-          </button>
-        </AnimatedWrapper>
+        <div className="relative z-10 flex flex-col items-center text-center gap-6 px-4">
+          <EffectWrapper delay={0.2}>
+            <h1 className="text-6xl font-extrabold tracking-tight text-white drop-shadow-xl">
+              Elevate Your Style
+            </h1>
+          </EffectWrapper>
+
+          <EffectWrapper delay={0.4}>
+            <p className="text-xl max-w-2xl text-white/90">
+              Discover new arrivals crafted for a modern and elegant wardrobe.
+            </p>
+          </EffectWrapper>
+
+          <EffectWrapper delay={0.6}>
+            <Link
+              to="/new"
+              className="mt-4 px-10 py-3 bg-white text-slate-900 rounded-full shadow font-semibold 
+                         hover:bg-slate-200 transition"
+            >
+              Shop Now
+            </Link>
+          </EffectWrapper>
+        </div>
       </section>
 
-      {/* Ürünler */}
-      <section className="px-4 py-12">
-        <div className="mx-auto w-full max-w-[1280px]">
-          <AnimatedWrapper delay={0.1}>
-            <h2 className="text-center text-3xl font-bold mb-3 tracking-tight
-                           text-slate-800 dark:text-slate-100">
-              TRENDING
-            </h2>
-          </AnimatedWrapper>
+      {/* ============================== */}
+      {/* FALL BANNER */}
+      {/* ============================== */}
+      <section className="relative w-full mt-14 px-4">
+        <div className="relative rounded-2xl overflow-hidden shadow-xl h-[480px]">
+          <img src="/images/fall.jpg" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-800/40 to-transparent" />
 
-          {/* ince vurgu çizgisi */}
-          <div className="mx-auto mb-8 h-1 w-24 rounded-full
-                          bg-emerald-600 dark:bg-emerald-400"></div>
+          <div className="absolute bottom-16 left-16 text-white flex flex-col gap-4">
+            <EffectWrapper delay={0.1}>
+              <h2 className="text-5xl font-extrabold">Fall Collection 2025</h2>
+            </EffectWrapper>
 
-          {/* Filtre bar (ayrı component) */}
-          <FilterBar
-            categories={categories}
-            category={category}
-            setCategory={setCategory}
-            sortOption={sortOption}
-            setSortOption={setSortOption}
-          />
+            <EffectWrapper delay={0.25}>
+              <p className="text-lg opacity-90 max-w-lg">
+                Minimal, modern and curated for the season.
+              </p>
+            </EffectWrapper>
 
-          <div className="rounded-2xl border shadow-xl transition-colors duration-300
-                          border-slate-200 dark:border-slate-800">
-            <div className="rounded-2xl p-6
-                            bg-white dark:bg-slate-900">
-
-              {error && <p className="text-center text-red-500">{error}</p>}
-
-              {/* Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 items-stretch mb-10">
-                {filteredProducts.map((product, index) => (
-                  <AnimatedWrapper
-                    key={product._id || product.id || index}
-                    delay={index * 0.1}
-                    className="h-full flex"
-                  >
-                    <ProductCard product={product} />
-                  </AnimatedWrapper>
-                ))}
-              </div>
-
-              {/* Ürünleri Değiştir */}
-              <div className="flex justify-center">
-                <button
-                  onClick={shuffleProducts}
-                  className="rounded-full px-8 py-3 font-semibold shadow-lg
-                             text-white
-                             bg-emerald-600 hover:bg-emerald-700
-                             dark:bg-emerald-500 dark:hover:bg-emerald-400
-                             focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400
-                             transition"
-                >
-                  Ürünleri Değiştir
-                </button>
-              </div>
-
-            </div>
+            <EffectWrapper delay={0.4}>
+              <Link
+                to="/collection"
+                className="inline-block mt-4 px-8 py-2 bg-white text-slate-900 rounded-full 
+                           font-semibold shadow hover:bg-slate-200 transition"
+              >
+                Explore Now
+              </Link>
+            </EffectWrapper>
           </div>
         </div>
       </section>
+
+      {/* ============================== */}
+      {/* NEW ARRIVALS */}
+      {/* ============================== */}
+      <section className="px-4 py-16">
+        <div className="max-w-[1280px] mx-auto">
+
+          <EffectWrapper delay={0.1}>
+            <h2 className="text-center text-4xl font-bold text-slate-900 dark:text-white">
+              New Arrivals
+            </h2>
+          </EffectWrapper>
+
+          <p className="text-center mt-2 mb-12 text-slate-600 dark:text-slate-400">
+            Explore the newest curated categories
+          </p>
+
+          <div className="grid grid-cols-3 gap-10">
+
+            <EffectWrapper delay={0.2}>
+              <Link className="group relative h-[360px] rounded-3xl overflow-hidden shadow-lg block">
+                <img src="/images/women.jpg" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/20 to-transparent" />
+                <div className="absolute bottom-6 left-6 text-white">
+                  <h3 className="text-3xl font-bold">Women’s</h3>
+                  <p className="opacity-90">Collection</p>
+                </div>
+              </Link>
+            </EffectWrapper>
+
+            <EffectWrapper delay={0.3}>
+              <Link className="group relative h-[360px] rounded-3xl overflow-hidden shadow-lg block">
+                <img src="/images/men.jpg" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/20 to-transparent" />
+                <div className="absolute bottom-6 left-6 text-white">
+                  <h3 className="text-3xl font-bold">Men’s</h3>
+                  <p className="opacity-90">Collection</p>
+                </div>
+              </Link>
+            </EffectWrapper>
+
+            <EffectWrapper delay={0.4}>
+              <Link className="group relative h-[360px] rounded-3xl overflow-hidden shadow-lg block">
+                <img src="/images/streetwear.jpg" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/20 to-transparent" />
+                <div className="absolute bottom-6 left-6 text-white">
+                  <h3 className="text-3xl font-bold">Streetwear</h3>
+                  <p className="opacity-90">Collection</p>
+                </div>
+              </Link>
+            </EffectWrapper>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ============================== */}
+      {/* TRENDING SLIDER */}
+      {/* ============================== */}
+      <section className="px-4 pt-10 pb-20">
+        <div className="max-w-[1280px] mx-auto">
+
+          <EffectWrapper delay={0.1}>
+            <h2 className="text-center text-4xl font-bold text-slate-900 dark:text-white">
+              Trending Picks
+            </h2>
+          </EffectWrapper>
+
+          <p className="text-center mb-8 text-slate-600 dark:text-slate-400">
+            Discover what’s trending this week
+          </p>
+
+          <div className="relative bg-white/80 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 
+                          backdrop-blur-lg shadow-xl rounded-2xl">
+
+            <button
+              onClick={prev}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full 
+                         bg-slate-900 text-white shadow hover:bg-slate-800 transition"
+            >
+              <ChevronLeft className="w-7 h-7" />
+            </button>
+
+            <button
+              onClick={next}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full 
+                         bg-slate-900 text-white shadow hover:bg-slate-800 transition"
+            >
+              <ChevronRight className="w-7 h-7" />
+            </button>
+
+            <div className="p-8">
+              <div className="grid grid-cols-4 gap-10">
+                {paginatedProducts.map((product, i) => (
+                  <EffectWrapper key={product.id} delay={i * 0.08}>
+                    <ProductCard product={product} />
+                  </EffectWrapper>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ============================== */}
+      {/* ⭐ YENİ EKLENEN BİLGİLENDİRME ALANI */}
+      {/* ============================== */}
+      <InfoSection />
+
     </div>
   );
 };

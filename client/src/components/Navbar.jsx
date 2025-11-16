@@ -3,9 +3,16 @@ import { Link } from 'react-router-dom';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { FiShoppingCart } from 'react-icons/fi';
 import { Search, X } from 'lucide-react';
+
 import DarkModeToggle from './DarkModeToggle';
 import SiteIcon from './SiteIcon';
+import CategoryDropdown from './CategoryDropdown';
+import ProfileMenu from './ProfileMenu';
 
+
+// -------------------------------------------
+// Entegre Search Bar
+// -------------------------------------------
 const IntegratedSearchBar = ({ value, onChange }) => (
   <div className="relative w-full max-w-md mx-auto">
     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 w-4 h-4" />
@@ -16,9 +23,9 @@ const IntegratedSearchBar = ({ value, onChange }) => (
                  bg-white dark:bg-slate-900
                  border border-slate-300 dark:border-slate-700
                  text-slate-900 dark:text-slate-100
-                 rounded-lg shadow-inner
-                 placeholder-slate-400 dark:placeholder-slate-500
+                 rounded-lg shadow-sm
                  focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400
+                 placeholder-slate-400 dark:placeholder-slate-500
                  transition"
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -26,8 +33,7 @@ const IntegratedSearchBar = ({ value, onChange }) => (
     {value && (
       <button
         onClick={() => onChange('')}
-        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-        aria-label="Temizle"
+        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition"
       >
         <X className="w-4 h-4" />
       </button>
@@ -35,87 +41,128 @@ const IntegratedSearchBar = ({ value, onChange }) => (
   </div>
 );
 
+
+
+// -------------------------------------------
+// NAVBAR — Tümleşik & HCI Uyumlu
+// -------------------------------------------
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
-    <nav
-      className="sticky top-0 z-50
-                 bg-white/95 dark:bg-slate-950/90
-                 text-slate-900 dark:text-slate-100
-                 border-b border-slate-200 dark:border-slate-800
-                 shadow-sm backdrop-blur"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center">
-              <SiteIcon className="h-10 w-auto text-slate-800 dark:text-slate-100 transition-transform duration-300 hover:scale-105" />
-            </Link>
-          </div>
+    <>
+      <nav
+        className="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/80
+                   backdrop-blur-xl border-b border-slate-200 dark:border-slate-800
+                   shadow-sm"
+      >
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between">
 
-          {/* Arama Çubuğu */}
-          <div className="hidden lg:block flex-1 mx-8">
+          {/* LOGO */}
+          <Link to="/" className="flex items-center">
+            <SiteIcon className="h-10 w-auto hover:scale-110 transition-transform text-slate-800 dark:text-slate-100" />
+          </Link>
+
+
+          {/* ORTA ARAMA */}
+          <div className="hidden lg:block flex-1 mx-10">
             <IntegratedSearchBar value={searchTerm} onChange={setSearchTerm} />
           </div>
 
-          {/* Menü ve Aksiyonlar */}
-          <div className="flex items-center space-x-6">
-            {/* Menü Linkleri */}
-            <div className="hidden md:flex items-center space-x-6">
-              <Link
-                to="/products"
-                className="font-medium hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-              >
-                WOMANSWEAR
-              </Link>
-              <Link
-                to="/about"
-                className="font-medium hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-              >
-                MENSWEAR
-              </Link>
-            </div>
 
-            {/* Aksiyon Butonları */}
-            <div className="flex items-center space-x-4">
-              <DarkModeToggle />
+          {/* MENÜLER + İKONLAR */}
+          <div className="hidden md:flex items-center space-x-8">
 
-              <Link
-                to="/favorites"
-                className="hidden md:flex items-center gap-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-              >
-                <AiOutlineHeart className="text-xl" />
-                <span className="hidden lg:inline">Favorites</span>
-              </Link>
+            {/* ---------------------------------------------
+               WOMAN MENU — TUTARLI (Clothing / Footwear / Accessories)
+            --------------------------------------------- */}
+            <CategoryDropdown
+              title="WOMANSWEAR"
+              columns={[
+                {
+                  title: "Clothing",
+                  links: [
+                    { label: "Tops", href: "/womens/tops" },
+                    { label: "Jeans", href: "/womens/jeans" },
+                    { label: "Dresses", href: "/womens/dresses" },
+                    { label: "Coats", href: "/womens/coats" },
+                  ],
+                },
+                {
+                  title: "Footwear",
+                  links: [
+                    { label: "Heels", href: "/womens/heels" },
+                    { label: "Boots", href: "/womens/boots" },
+                    { label: "Sneakers", href: "/womens/sneakers" },
+                  ],
+                },
+                {
+                  title: "Accessories",
+                  links: [
+                    { label: "Bags", href: "/womens/bags" },
+                    { label: "Jewelry", href: "/womens/jewelry" },
+                    { label: "Scarves", href: "/womens/scarves" },
+                  ],
+                },
+              ]}
+            />
 
-              <Link
-                to="/cart"
-                className="flex items-center gap-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-              >
-                <FiShoppingCart className="text-xl" />
-                <span className="hidden lg:inline">Bag</span>
-              </Link>
-            </div>
+            {/* ---------------------------------------------
+               MEN MENU — TAM PARALEL YAPI (Clothing / Footwear / Accessories)
+            --------------------------------------------- */}
+            <CategoryDropdown
+              title="MENSWEAR"
+              columns={[
+                {
+                  title: "Clothing",
+                  links: [
+                    { label: "T-Shirts", href: "/mens/tshirts" },
+                    { label: "Pants", href: "/mens/pants" },
+                    { label: "Shirts", href: "/mens/shirts" },
+                    { label: "Hoodies", href: "/mens/hoodies" },
+                  ],
+                },
+                {
+                  title: "Footwear",
+                  links: [
+                    { label: "Sneakers", href: "/mens/sneakers" },
+                    { label: "Boots", href: "/mens/boots" },
+                    { label: "Loafers", href: "/mens/loafers" },
+                  ],
+                },
+                {
+                  title: "Accessories",
+                  links: [
+                    { label: "Belts", href: "/mens/belts" },
+                    { label: "Watches", href: "/mens/watches" },
+                    { label: "Wallets", href: "/mens/wallets" },
+                  ],
+                },
+              ]}
+            />
 
-            {/* Login */}
-            <div className="hidden md:flex">
-              <Link
-                to="/login"
-                className="px-4 py-2 rounded-md font-semibold
-                           bg-emerald-600 text-white
-                           hover:bg-emerald-700
-                           dark:bg-emerald-500 dark:hover:bg-emerald-400
-                           transition-colors"
-              >
-                Login
-              </Link>
-            </div>
+
+            {/* FAVORİLER */}
+            <Link to="/favorites" className="flex items-center gap-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+              <AiOutlineHeart className="text-xl" />
+              <span className="hidden lg:inline">Favorites</span>
+            </Link>
+
+            {/* SEPET */}
+            <Link to="/cart" className="flex items-center gap-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+              <FiShoppingCart className="text-xl" />
+              <span className="hidden lg:inline">Bag</span>
+            </Link>
+
+            {/* PROFIL MENÜSÜ */}
+            <ProfileMenu />
           </div>
+
+          {/* DARK MODE SWITCH */}
+          <DarkModeToggle />
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 };
 

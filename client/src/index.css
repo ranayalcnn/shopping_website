@@ -1,10 +1,19 @@
-body {
-  font-family: 'Inter', sans-serif;
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html, body {
+    @apply
+      bg-slate-200
+      dark:bg-slate-200
+      text-slate-900
+      dark:text-slate-100
+      transition-colors duration-500 ease-in-out
+      min-h-screen;
+  }
 
-
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+}

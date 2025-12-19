@@ -1,241 +1,205 @@
 // server/controllers/productController.js
 
-// **Genişletilmiş 20 ürünlük demo veri**
+// ===============================================
+// REALISTIC FASHION E-COMMERCE PRODUCTS (12 ITEMS)
+// ===============================================
+
 const sampleProducts = [
-    // 1
-    { 
-        id: 1, 
-        name: "Leather Jacket", 
-        price: 12000, 
-        description: "Hızlı ve modern.",
-        category: "Erkek",
-        image: "/images/ceket1.jpg",
-        hoverImage: "/images/ceket2.jpg"
-    },
 
-    // 2
-    { 
-        id: 2, 
-        name: "Bag", 
-        price: 25000, 
-        description: "Premium deri kadın çanta.",
-        category: "Kadın",
-        image: "/images/bag1.jpg",
-        hoverImage: "/images/bag2.jpg"
-    },
+  // 1 — Leather Jacket
+  {
+    id: 1,
+    name: "Leather Jacket",
+    price: 11999,
+    description: "Modern fit premium leather jacket.",
+    gender: "womens",
+    category: "coats",
+    image: "/images/ceket1.jpg",
+    hoverImage: "/images/ceket2.jpg",
+    season: "fall",
+    stock: 12,
+    premium: true
+  },
 
-    // 3
-    { 
-        id: 3, 
-        name: "Kablosuz Kulaklık", 
-        price: 1500, 
-        description: "Yüksek ses kalitesi.",
-        category: "Teknoloji",
-        image: "/images/headphone.jpg",
-        hoverImage: "/images/headphone2.jpg"
-    },
+  // 2 — Leather Bag
+  {
+    id: 2,
+    name: "Leather Bag",
+    price: 8999,
+    description: "Premium handmade leather shoulder bag.",
+    gender: "womens",
+    category: "bags",
+    image: "/images/bag1.jpg",
+    hoverImage: "/images/bag2.jpg",
+    season: "fall",
+    stock: 8,
+    premium: true
+  },
 
-    // 4
-    { 
-        id: 4, 
-        name: "Güneş Gözlüğü", 
-        price: 800, 
-        description: "Tarz ve koruma bir arada.",
-        category: "Aksesuar",
-        image: "/images/glasses1.jpg",
-        hoverImage: "/images/glasses2.jpg"
-    },
+  // 3 — Oversized Hoodie
+  {
+    id: 3,
+    name: "Oversized Hoodie",
+    price: 2499,
+    description: "Soft oversized hoodie with minimalist embroidery.",
+    gender: "womens",
+    category: "hoodies",
+    image: "/images/hoodie1.jpg",
+    hoverImage: "/images/hoodie2.jpg",
+    season: "fall",
+    stock: 20,
+    premium: false
+  },
 
-    // 5
-    { 
-        id: 5, 
-        name: "Sneaker Ayakkabı", 
-        price: 2200, 
-        description: "Her gün rahatlık.",
-        category: "Kadın",
-        image: "/images/shoes1.jpg",
-        hoverImage: "/images/shoes2.jpg"
-    },
+  // 4 — Winter Coat
+  {
+    id: 4,
+    name: "Winter Coat",
+    price: 5499,
+    description: "Warm and clean winter coat.",
+    gender: "mens",
+    category: "coats",
+    image: "/images/mont1.jpg",
+    hoverImage: "/images/mont1.jpg",
+    season: "fall",
+    stock: 15,
+    premium: true
+  },
 
-    // 6
-    { 
-        id: 6,
-        name: "Erkek Siyah T-Shirt",
-        price: 350,
-        description: "Yumuşak pamuklu günlük kullanım.",
-        category: "Erkek",
-        image: "/images/tshirt1.jpg",
-        hoverImage: "/images/tshirt2.jpg"
-    },
+  // 5 — Streetwear Printed Jeans
+  {
+    id: 5,
+    name: "Streetwear Printed Jeans",
+    price: 1799,
+    description: "Loose-fit denim jeans with bold streetwear graphics.",
+    gender: "mens",
+    category: "jeans",
+    image: "/images/jean1.jpg",
+    hoverImage: "/images/jean1.jpg",
+    season: "none",
+    stock: 30,
+    premium: false
+  },
 
-    // 7
-    {
-        id: 7,
-        name: "Kadın Crop Top",
-        price: 290,
-        description: "Şık ve rahat.",
-        category: "Kadın",
-        image: "/images/crop1.jpg",
-        hoverImage: "/images/crop2.jpg"
-    },
+  // 6 — Everyday Coat
+  {
+    id: 6,
+    name: "Everyday Coat",
+    price: 1899,
+    description: "Comfortable coat for everyday wear.",
+    gender: "womens",
+    category: "coats",
+    image: "/images/cekett1.jpg",
+    hoverImage: "/images/cekett1.jpg",
+    season: "none",
+    stock: 16,
+    premium: false
+  },
 
-    // 8
-    {
-        id: 8,
-        name: "Spor Ayakkabı",
-        price: 1800,
-        description: "Koşu ve yürüyüş için ideal.",
-        category: "Spor",
-        image: "/images/sport1.jpg",
-        hoverImage: "/images/sport2.jpg"
-    },
+  // 7 — Classic Shirt
+  {
+    id: 7,
+    name: "Classic Shirt",
+    price: 1199,
+    description: "Classic cotton shirt with a clean look.",
+    gender: "womens",
+    category: "tops",
+    image: "/images/bluz1.jpg",
+    hoverImage: "/images/bluz1.jpg",
+    season: "none",
+    stock: 22,
+    premium: false
+  },
 
-    // 9
-    {
-        id: 9,
-        name: "Akıllı Saat",
-        price: 3200,
-        description: "Sağlık takibi ve bildirimler.",
-        category: "Teknoloji",
-        image: "/images/watch1.jpg",
-        hoverImage: "/images/watch2.jpg"
-    },
+  // 8 — Platform Sneakers
+  {
+    id: 8,
+    name: "Platform Sneakers",
+    price: 2999,
+    description: "Everyday platform sneakers with modern style.",
+    gender: "mens",
+    category: "sneakers",
+    image: "/images/sneaker1.jpg",
+    hoverImage: "/images/sneaker1.jpg",
+    season: "none",
+    stock: 14,
+    premium: false
+  },
 
-    // 10
-    {
-        id: 10,
-        name: "Kadın Jean",
-        price: 850,
-        description: "Skinny fit denim.",
-        category: "Kadın",
-        image: "/images/jean1.jpg",
-        hoverImage: "/images/jean2.jpg"
-    },
+  // 9 — High Heels
+  {
+    id: 9,
+    name: "High Heels",
+    price: 1699,
+    description: "Elegant high heels for special occasions.",
+    gender: "womens",
+    category: "heels",
+    image: "/images/topuklu1.jpg",
+    hoverImage: "/images/topuklu1.jpg",
+    season: "fall",
+    stock: 18,
+    premium: false
+  },
 
-    // 11
-    {
-        id: 11,
-        name: "Erkek Mont",
-        price: 2600,
-        description: "Kışlık sıcak tutan mont.",
-        category: "Erkek",
-        image: "/images/mont1.jpg",
-        hoverImage: "/images/mont2.jpg"
-    },
+  // 10 — Basic Sweatshirt
+  {
+    id: 10,
+    name: "Basic Sweatshirt",
+    price: 1699,
+    description: "Comfortable cotton sweatshirt designed for everyday wear.",
+    gender: "mens",
+    category: "sweatshirts",
+    image: "/images/sweatshirt1.jpg",
+    hoverImage: "/images/sweatshirt1.jpg",
+    season: "fall",
+    stock: 45,
+    premium: false
+  },
 
-    // 12
-    {
-        id: 12,
-        name: "Şapka",
-        price: 150,
-        description: "Tarz bir tamamlayıcı.",
-        category: "Aksesuar",
-        image: "/images/hat1.jpg",
-        hoverImage: "/images/hat2.jpg"
-    },
+  // 11 — Oversized Graphic T-Shirt
+  {
+    id: 11,
+    name: "Oversized Graphic T-Shirt",
+    price: 999,
+    description: "Oversized cotton t-shirt with bold streetwear graphic print.",
+    gender: "mens",
+    category: "tshirts",
+    image: "/images/tshirt1.jpg",
+    hoverImage: "/images/tshirt1.jpg",
+    season: "none",
+    stock: 35,
+    premium: false
+  },
 
-    // 13
-    {
-        id: 13,
-        name: "Kadın Çizme",
-        price: 3250,
-        description: "Kış sezonu için ideal.",
-        category: "Kadın",
-        image: "/images/boot1.jpg",
-        hoverImage: "/images/boot2.jpg"
-    },
+  // 12 — Leather Wallet
+  {
+    id: 12,
+    name: "Leather Wallet",
+    price: 1499,
+    description: "Compact leather wallet with multiple card slots.",
+    gender: "womens",
+    category: "wallets",
+    image: "/images/cüzdan1.jpg",
+    hoverImage: "/images/cüzdan1.jpg",
+    season: "none",
+    stock: 20,
+    premium: true
+  }
 
-    // 14
-    {
-        id: 14,
-        name: "Sırt Çantası",
-        price: 600,
-        description: "Günlük kullanım için hafif.",
-        category: "Aksesuar",
-        image: "/images/backpack1.jpg",
-        hoverImage: "/images/backpack2.jpg"
-    },
-
-    // 15
-    {
-        id: 15,
-        name: "Bluetooth Hoparlör",
-        price: 980,
-        description: "Güçlü bass performansı.",
-        category: "Teknoloji",
-        image: "/images/speaker1.jpg",
-        hoverImage: "/images/speaker2.jpg"
-    },
-
-    // 16
-    {
-        id: 16,
-        name: "Erkek Deri Kemer",
-        price: 450,
-        description: "%100 gerçek deri.",
-        category: "Erkek",
-        image: "/images/belt1.jpg",
-        hoverImage: "/images/belt2.jpg"
-    },
-
-    // 17
-    {
-        id: 17,
-        name: "Kadın Parfüm",
-        price: 780,
-        description: "Çiçeksi kalıcı bir koku.",
-        category: "Kadın",
-        image: "/images/perfume1.jpg",
-        hoverImage: "/images/perfume2.jpg"
-    },
-
-    // 18
-    {
-        id: 18,
-        name: "Erkek Parfüm",
-        price: 820,
-        description: "Odunsu taze bir koku.",
-        category: "Erkek",
-        image: "/images/perfume3.jpg",
-        hoverImage: "/images/perfume4.jpg"
-    },
-
-    // 19
-    {
-        id: 19,
-        name: "Gaming Mouse",
-        price: 540,
-        description: "RGB ışıklı hassas sensör.",
-        category: "Teknoloji",
-        image: "/images/mouse1.jpg",
-        hoverImage: "/images/mouse2.jpg"
-    },
-
-    // 20
-    {
-        id: 20,
-        name: "Spor Tayt",
-        price: 430,
-        description: "Esnek ve nefes alan kumaş.",
-        category: "Spor",
-        image: "/images/tights1.jpg",
-        hoverImage: "/images/tights2.jpg"
-    },
 ];
 
-// Tüm ürünleri döndüren fonksiyon
+// ============================================================
+// ROUTES
+// ============================================================
+
 exports.getProducts = (req, res) => {
-    res.json(sampleProducts);
+  res.json(sampleProducts);
 };
 
-// Belirli bir ürünü ID ile döndüren fonksiyon
 exports.getProductById = (req, res) => {
-    const productId = parseInt(req.params.id); 
-    const product = sampleProducts.find(p => p.id === productId);
+  const productId = parseInt(req.params.id);
+  const product = sampleProducts.find(p => p.id === productId);
 
-    if (product) {
-        res.json(product);
-    } else {
-        res.status(404).json({ message: 'Ürün bulunamadı.' });
-    }
+  if (product) res.json(product);
+  else res.status(404).json({ message: "Product not found" });
 };

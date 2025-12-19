@@ -5,7 +5,7 @@ import ProductCard from "../components/ProductCard";
 import EffectWrapper from "../components/EffectWrapper";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import InfoSection from "../components/InfoSection"; // ⭐ YENİ EKLENDİ
+import InfoSection from "../components/InfoSection";
 
 const HomePage = () => {
   const [allProducts, setAllProducts] = useState([]);
@@ -51,19 +51,18 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
 
-      {/* ============================== */}
-      {/* HERO */}
-      {/* ============================== */}
-      <section className="relative h-[70vh] w-full overflow-hidden shadow-xl flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900" />
-
-        <motion.img
-          src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1600"
-          initial={{ scale: 1.05 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 6, ease: "easeOut" }}
-          className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay"
-        />
+      {/* ================= HERO ================= */}
+      <section className="relative h-[75vh] w-full overflow-hidden shadow-xl flex items-center justify-center">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900" />
+          <motion.img
+            src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1600"
+            initial={{ scale: 1.06 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 6, ease: "easeOut" }}
+            className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay"
+          />
+        </div>
 
         <div className="relative z-10 flex flex-col items-center text-center gap-6 px-4">
           <EffectWrapper delay={0.2}>
@@ -90,17 +89,20 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ============================== */}
-      {/* FALL BANNER */}
-      {/* ============================== */}
-      <section className="relative w-full mt-14 px-4">
+      {/* ================= FALL BANNER ================= */}
+      <section className="relative w-full mt-20 px-4">
         <div className="relative rounded-2xl overflow-hidden shadow-xl h-[480px]">
-          <img src="/images/fall.jpg" className="absolute inset-0 w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-800/40 to-transparent" />
+          <img
+            src="/images/fall.jpg"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-800/40 to-transparent pointer-events-none" />
 
-          <div className="absolute bottom-16 left-16 text-white flex flex-col gap-4">
+          <div className="absolute bottom-16 left-16 text-white flex flex-col gap-4 z-10">
             <EffectWrapper delay={0.1}>
-              <h2 className="text-5xl font-extrabold">Fall Collection 2025</h2>
+              <h2 className="text-5xl font-extrabold">
+                Fall Collection 2025
+              </h2>
             </EffectWrapper>
 
             <EffectWrapper delay={0.25}>
@@ -122,10 +124,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ============================== */}
-      {/* NEW ARRIVALS */}
-      {/* ============================== */}
-      <section className="px-4 py-16">
+      {/* ================= NEW ARRIVALS ================= */}
+      <section className="px-4 py-24">
         <div className="max-w-[1280px] mx-auto">
 
           <EffectWrapper delay={0.1}>
@@ -134,14 +134,14 @@ const HomePage = () => {
             </h2>
           </EffectWrapper>
 
-          <p className="text-center mt-2 mb-12 text-slate-600 dark:text-slate-400">
+          <p className="text-center mt-3 mb-14 text-slate-600 dark:text-slate-400">
             Explore the newest curated categories
           </p>
 
-          <div className="grid grid-cols-3 gap-10">
+          <div className="grid grid-cols-3 gap-12">
 
             <EffectWrapper delay={0.2}>
-              <Link className="group relative h-[360px] rounded-3xl overflow-hidden shadow-lg block">
+              <Link to="/women" className="group relative h-[360px] rounded-3xl overflow-hidden shadow-lg block">
                 <img src="/images/women.jpg" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/20 to-transparent" />
                 <div className="absolute bottom-6 left-6 text-white">
@@ -152,7 +152,7 @@ const HomePage = () => {
             </EffectWrapper>
 
             <EffectWrapper delay={0.3}>
-              <Link className="group relative h-[360px] rounded-3xl overflow-hidden shadow-lg block">
+              <Link to="/men" className="group relative h-[360px] rounded-3xl overflow-hidden shadow-lg block">
                 <img src="/images/men.jpg" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/20 to-transparent" />
                 <div className="absolute bottom-6 left-6 text-white">
@@ -163,7 +163,7 @@ const HomePage = () => {
             </EffectWrapper>
 
             <EffectWrapper delay={0.4}>
-              <Link className="group relative h-[360px] rounded-3xl overflow-hidden shadow-lg block">
+              <Link to="/streetwear" className="group relative h-[360px] rounded-3xl overflow-hidden shadow-lg block">
                 <img src="/images/streetwear.jpg" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/20 to-transparent" />
                 <div className="absolute bottom-6 left-6 text-white">
@@ -177,10 +177,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ============================== */}
-      {/* TRENDING SLIDER */}
-      {/* ============================== */}
-      <section className="px-4 pt-10 pb-20">
+      {/* ================= TRENDING SLIDER ================= */}
+      <section className="px-4 pt-10 pb-24">
         <div className="max-w-[1280px] mx-auto">
 
           <EffectWrapper delay={0.1}>
@@ -189,7 +187,7 @@ const HomePage = () => {
             </h2>
           </EffectWrapper>
 
-          <p className="text-center mb-8 text-slate-600 dark:text-slate-400">
+          <p className="text-center mb-12 mt-3 text-slate-600 dark:text-slate-400">
             Discover what’s trending this week
           </p>
 
@@ -198,22 +196,28 @@ const HomePage = () => {
 
             <button
               onClick={prev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full 
-                         bg-slate-900 text-white shadow hover:bg-slate-800 transition"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20
+                         w-10 h-10 flex items-center justify-center rounded-full
+                         bg-white/90 dark:bg-slate-800
+                         border border-slate-300 dark:border-slate-600
+                         shadow-md hover:scale-105 transition"
             >
-              <ChevronLeft className="w-7 h-7" />
+              <ChevronLeft className="w-5 h-5 text-slate-800 dark:text-white" />
             </button>
 
             <button
               onClick={next}
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full 
-                         bg-slate-900 text-white shadow hover:bg-slate-800 transition"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20
+                         w-10 h-10 flex items-center justify-center rounded-full
+                         bg-white/90 dark:bg-slate-800
+                         border border-slate-300 dark:border-slate-600
+                         shadow-md hover:scale-105 transition"
             >
-              <ChevronRight className="w-7 h-7" />
+              <ChevronRight className="w-5 h-5 text-slate-800 dark:text-white" />
             </button>
 
-            <div className="p-8">
-              <div className="grid grid-cols-4 gap-10">
+            <div className="p-10">
+              <div className="grid grid-cols-4 gap-12">
                 {paginatedProducts.map((product, i) => (
                   <EffectWrapper key={product.id} delay={i * 0.08}>
                     <ProductCard product={product} />
@@ -226,11 +230,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ============================== */}
-      {/* ⭐ YENİ EKLENEN BİLGİLENDİRME ALANI */}
-      {/* ============================== */}
       <InfoSection />
-
     </div>
   );
 };

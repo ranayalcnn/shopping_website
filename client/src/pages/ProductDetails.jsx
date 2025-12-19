@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchProductById, fetchProducts } from "../api/productAPI";
+import { toast } from "react-hot-toast";
+
+import Breadcrumb from "../components/Breadcrumb";
 
 import ProductImages from "../components/product/ProductImages";
 import FavoriteButton from "../components/product/FavoriteButton";
@@ -9,6 +12,8 @@ import QuantitySelector from "../components/product/QuantitySelector";
 import FeatureIcons from "../components/product/FeatureIcons";
 import ProductAccordion from "../components/product/ProductAccordion";
 import RecommendedProducts from "../components/product/RecommendedProducts";
+import ReviewList from "../components/product/ReviewList";
+import ReviewForm from "../components/product/ReviewForm";
 
 import { FiShoppingCart } from "react-icons/fi";
 
@@ -19,116 +24,192 @@ const ProductDetails = () => {
 
   const [product, setProduct] = useState(null);
   const [recommended, setRecommended] = useState([]);
-
   const [mainImage, setMainImage] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [buttonAnimate, setButtonAnimate] = useState(false);
+  const [reviews, setReviews] = useState([]);
+
+  const SAMPLE_REVIEWS = [
+    {
+      name: "Emily R.",
+      rating: 5,
+      comment: "Amazing fabric quality! Better than expected.",
+      date: "2024-12-10",
+    },
+    {
+      name: "Jessica M.",
+      rating: 4,
+      comment: "Color matches the photos. I sized up and it fits perfectly.",
+      date: "2024-12-09",
+    },
+    {
+      name: "Sarah K.",
+      rating: 5,
+      comment: "Super fast shipping and very comfortable material!",
+      date: "2024-12-08",
+    },
+  ];
 
   useEffect(() => {
-    const load = async () => {
+    const loadProduct = async () => {
       const data = await fetchProductById(id);
       setProduct(data);
       setMainImage(data.image);
     };
-    load();
 
-    const loadAll = async () => {
+    const loadRecommended = async () => {
       const all = await fetchProducts();
       setRecommended(all.filter((p) => p.id !== Number(id)).slice(0, 4));
     };
-    loadAll();
+
+    loadProduct();
+    loadRecommended();
+
+    const stored = JSON.parse(localStorage.getItem(`reviews_${id}`) || "[]");
+    if (stored.length === 0) {
+      setReviews(SAMPLE_REVIEWS);
+      localStorage.setItem(`reviews_${id}`, JSON.stringify(SAMPLE_REVIEWS));
+    } else {
+      setReviews(stored);
+    }
   }, [id]);
 
-  useEffect(() => {
-    const list = JSON.parse(localStorage.getItem("favorites") || "[]");
-    if (list.includes(Number(id))) setIsFavorite(true);
-  }, [id]);
-
-  const toggleFavorite = () => {
-    const list = JSON.parse(localStorage.getItem("favorites") || "[]");
-    let updated = isFavorite
-      ? list.filter((i) => i !== Number(id))
-      : [...list, Number(id)];
-
-    localStorage.setItem("favorites", JSON.stringify(updated));
-    setIsFavorite(!isFavorite);
+  const addReview = (review) => {
+    const updated = [...reviews, review];
+    setReviews(updated);
+    localStorage.setItem(`reviews_${id}`, JSON.stringify(updated));
+    toast.success("Review submitted successfully.");
   };
 
-  if (!product) return <div className="p-20 text-center">Loading…</div>;
+  const addToCart = () => {
+    if (!selectedSize) {
+      toast.error("Please select a size first.");
+      return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    const existingIndex = cart.findIndex(
+      (item) => item.id === product.id && item.size === selectedSize
+    );
+
+    if (existingIndex !== -1) {
+      cart[existingIndex].quantity += quantity;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        size: selectedSize,
+        quantity,
+      });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    toast.success("Added to cart!");
+
+    setButtonAnimate(true);
+    setTimeout(() => setButtonAnimate(false), 250);
+  };
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center
+                      bg-white dark:bg-slate-900
+                      text-slate-900 dark:text-slate-100">
+        Loading…
+      </div>
+    );
+  }
 
   return (
-    <div
-      className="min-h-screen px-4 py-14 max-w-7xl mx-auto
-      bg-white dark:bg-slate-900
-      text-slate-900 dark:text-slate-100
-      transition-colors duration-300"
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-        
-        <ProductImages
-          mainImage={mainImage}
-          setMainImage={setMainImage}
-          product={product}
-          onOpenModal={() => {}}
-        />
+    /* 🌑 FULL SCREEN WRAPPER — BEYAZLIK SIFIR */
+    <div className="w-full min-h-screen
+                    bg-white dark:bg-slate-900
+                    text-slate-900 dark:text-slate-100">
 
-        <div className="space-y-8">
+      {/* CONTENT CONTAINER */}
+      <div className="max-w-[1400px] mx-auto px-6 py-14">
 
-          <div className="flex justify-between items-start">
-            <h1 className="text-4xl font-semibold tracking-tight">
-              {product.name}
-            </h1>
-            <FavoriteButton isFavorite={isFavorite} toggleFavorite={toggleFavorite} />
-          </div>
+        <Breadcrumb />
 
-          <p className="text-3xl font-bold text-slate-900 dark:text-white">
-            {product.price} ₺
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mt-8">
 
-          <FeatureIcons />
-
-          <p className="text-slate-700 dark:text-slate-300">
-            {product.description}
-          </p>
-
-          <SizeSelector
-            sizes={SIZES}
-            selectedSize={selectedSize}
-            setSelectedSize={setSelectedSize}
+          <ProductImages
+            mainImage={mainImage}
+            setMainImage={setMainImage}
+            product={product}
           />
 
-          <QuantitySelector quantity={quantity} setQuantity={setQuantity} />
+          <div className="space-y-8">
 
-          <button
-            className={`
-              w-full py-4 rounded-xl flex items-center justify-center gap-3 
-              text-lg font-medium transition shadow-lg
-              ${
-                selectedSize
-                  ? "bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-                  : "bg-slate-300 dark:bg-slate-700 text-slate-600 dark:text-slate-400 cursor-not-allowed"
-              }
-            `}
-          >
-            <FiShoppingCart className="text-2xl" />
-            Add to Cart
-          </button>
+            <h1 className="text-4xl font-semibold">{product.name}</h1>
+            <p className="text-3xl font-bold">{product.price} ₺</p>
 
-          <div className="space-y-4">
-            <ProductAccordion title="Material">Premium cotton blend.</ProductAccordion>
-            <ProductAccordion title="Care Instructions">
-              Machine wash cold. Do not bleach.
-            </ProductAccordion>
-            <ProductAccordion title="Shipping">
-              Free shipping 2–4 business days.
-            </ProductAccordion>
+            <FeatureIcons />
+
+            <p className="text-slate-700 dark:text-slate-300">
+              {product.description}
+            </p>
+
+            <SizeSelector
+              sizes={SIZES}
+              selectedSize={selectedSize}
+              setSelectedSize={setSelectedSize}
+            />
+
+            <QuantitySelector
+              quantity={quantity}
+              setQuantity={setQuantity}
+            />
+
+            <button
+              onClick={addToCart}
+              className={`
+                w-full py-4 rounded-xl
+                flex items-center justify-center gap-3
+                text-lg font-medium transition-all
+                ${
+                  selectedSize
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                    : "bg-slate-300 dark:bg-slate-700 text-slate-500 cursor-not-allowed"
+                }
+                ${buttonAnimate ? "scale-105" : ""}
+              `}
+            >
+              <FiShoppingCart className="text-2xl" />
+              Add to Cart
+            </button>
+
+            <div className="space-y-4">
+              <ProductAccordion title="Material">
+                Premium cotton blend.
+              </ProductAccordion>
+              <ProductAccordion title="Care Instructions">
+                Machine wash cold.
+              </ProductAccordion>
+              <ProductAccordion title="Shipping">
+                Free shipping within 2–4 business days.
+              </ProductAccordion>
+            </div>
+
           </div>
         </div>
-      </div>
 
-      <div className="mt-20">
-        <RecommendedProducts products={recommended} />
+        {/* REVIEWS */}
+        <div className="mt-24 max-w-3xl mx-auto">
+          <h2 className="text-2xl font-semibold mb-6">Customer Reviews</h2>
+          <ReviewList reviews={reviews} />
+          <ReviewForm onAddReview={addReview} />
+        </div>
+
+        {/* RECOMMENDED */}
+        <div className="mt-24">
+          <RecommendedProducts products={recommended} />
+        </div>
+
       </div>
     </div>
   );

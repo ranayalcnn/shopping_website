@@ -1,33 +1,48 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // ✅ useNavigate EKLENDİ
 import AnimatedWrapper from "../components/AnimatedWrapper";
 import { Eye, EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "react-hot-toast";
+import { useAuth } from "../components/AuthContext"; // ✅ EKLENDİ
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [show, setShow] = useState(false);
 
+  const navigate = useNavigate();     // ✅ EKLENDİ
+  const { login } = useAuth();        // ✅ EKLENDİ
+
   const submit = (e) => {
     e.preventDefault();
 
-    if (!email.includes("@")) return toast.error("Please enter a valid email.");
-    if (pass.length < 6) return toast.error("Password must be at least 6 characters.");
+    if (!email.includes("@"))
+      return toast.error("Please enter a valid email.");
 
-    toast.success("Logged in (demo)");
+    if (pass.length < 6)
+      return toast.error("Password must be at least 6 characters.");
+
+    // ✅ DEMO LOGIN (TASARIM BOZULMADAN)
+    login({
+      email,
+      name: email.split("@")[0],
+    });
+
+    toast.success("Logged in successfully");
+    navigate("/");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 dark:bg-slate-950">
       <AnimatedWrapper className="w-full max-w-lg">
-        <div className="
+        <div
+          className="
           p-10 rounded-2xl bg-white dark:bg-slate-900
           border border-slate-300 dark:border-slate-700
           shadow-xl
-        ">
-
+        "
+        >
           {/* HEADER */}
           <h1 className="text-4xl font-extrabold text-center text-slate-900 dark:text-slate-100">
             Welcome Back
@@ -56,7 +71,6 @@ const LoginPage = () => {
 
           {/* FORM */}
           <form onSubmit={submit} className="space-y-6">
-
             {/* EMAIL */}
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
@@ -104,6 +118,7 @@ const LoginPage = () => {
 
             {/* LOGIN BUTTON */}
             <button
+              type="submit"
               className="w-full py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700
                          text-white font-semibold transition"
             >

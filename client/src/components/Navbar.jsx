@@ -8,7 +8,7 @@ import { Search, X } from "lucide-react";
 import DarkModeToggle from "./DarkModeToggle";
 import CategoryDropdown from "./CategoryDropdown";
 import ProfileMenu from "./ProfileMenu";
-
+import { useAuth } from "./AuthContext"; // ✅ EKLENDİ
 
 // -------------------------------------------
 // Search Bar
@@ -46,26 +46,27 @@ const IntegratedSearchBar = ({ value, onChange }) => (
   </div>
 );
 
-
 // -------------------------------------------
-// NAVBAR — LUNORA Text Logo
+// NAVBAR — FIXED / NO GAP
 // -------------------------------------------
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { user } = useAuth(); // ✅ EKLENDİ
 
   return (
     <nav
       className="
-        sticky top-0 z-50
+        fixed top-0 inset-x-0 z-50
+        h-16
         bg-white/80 dark:bg-slate-950/80
         backdrop-blur-xl
         border-b border-slate-200 dark:border-slate-800
         shadow-sm
       "
     >
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 h-full flex items-center justify-between">
 
-        {/* LEFT — L U N O R A  LOGO */}
+        {/* LOGO */}
         <Link
           to="/"
           className="flex items-center hover:opacity-80 transition select-none"
@@ -83,12 +84,12 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* CENTER — SEARCH (LG only) */}
+        {/* SEARCH */}
         <div className="hidden lg:flex flex-1 justify-center px-8">
           <IntegratedSearchBar value={searchTerm} onChange={setSearchTerm} />
         </div>
 
-        {/* RIGHT — MENUS */}
+        {/* MENUS */}
         <div className="hidden md:flex items-center space-x-6 text-[15px] font-medium">
 
           <CategoryDropdown
@@ -153,7 +154,6 @@ const Navbar = () => {
             ]}
           />
 
-          {/* FAVORITES */}
           <Link
             to="/favorites"
             className="flex items-center gap-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition"
@@ -162,7 +162,6 @@ const Navbar = () => {
             <span className="hidden lg:inline">Favorites</span>
           </Link>
 
-          {/* BAG */}
           <Link
             to="/cart"
             className="flex items-center gap-1 hover:text-emerald-600 dark:hover:text-emerald-400 transition"
@@ -171,10 +170,19 @@ const Navbar = () => {
             <span className="hidden lg:inline">Bag</span>
           </Link>
 
-          <ProfileMenu />
+          {/* 🔑 AUTH KONTROLÜ — TASARIM BOZULMADAN */}
+          {user ? (
+            <ProfileMenu />
+          ) : (
+            <Link
+              to="/login"
+              className="hover:text-emerald-600 dark:hover:text-emerald-400 transition"
+            >
+              Login
+            </Link>
+          )}
         </div>
 
-        {/* DARK MODE TOGGLE */}
         <DarkModeToggle />
       </div>
     </nav>

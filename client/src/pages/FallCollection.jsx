@@ -17,50 +17,36 @@ const SkeletonCard = () => (
   </div>
 );
 
-const NewArrivals = () => {
+const FallCollection = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 ARTIK CATEGORY DEĞİL, GENDER
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState("all"); // gender
   const [sortOption, setSortOption] = useState("default");
 
   useEffect(() => {
     const load = async () => {
       const data = await fetchProducts();
-      setProducts(data);
+      setProducts(data.filter((p) => p.season === "fall"));
       setLoading(false);
     };
     load();
   }, []);
 
-  // 🔥 FILTER BAR'DA GÖRÜNECEK SEÇENEKLER
   const categories = ["all", "womens", "mens"];
 
-  // --------------------------------------
-  // FILTER + SORT LOGIC
-  // --------------------------------------
   const finalList = useMemo(() => {
     let list = [...products];
 
-    // 🔥 GENDER FİLTRESİ
     if (category !== "all") {
       list = list.filter(
         (p) => p.gender?.toLowerCase() === category
       );
     }
 
-    if (sortOption === "price-asc") {
-      list.sort((a, b) => a.price - b.price);
-    }
-
-    if (sortOption === "price-desc") {
-      list.sort((a, b) => b.price - a.price);
-    }
-
-    if (sortOption === "name") {
-      list.sort((a, b) => a.name.localeCompare(b.name));
-    }
+    if (sortOption === "price-asc") list.sort((a, b) => a.price - b.price);
+    if (sortOption === "price-desc") list.sort((a, b) => b.price - a.price);
+    if (sortOption === "name") list.sort((a, b) => a.name.localeCompare(b.name));
 
     return list;
   }, [products, category, sortOption]);
@@ -69,7 +55,7 @@ const NewArrivals = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors">
 
       {/* -------------------------------------- */}
-      {/* HERO (COMPACT) */}
+      {/* HERO (AYNI YAPI) */}
       {/* -------------------------------------- */}
       <section className="relative h-[34vh] flex items-center justify-center overflow-hidden">
         <img
@@ -81,13 +67,13 @@ const NewArrivals = () => {
         <div className="relative text-center max-w-xl">
           <EffectWrapper delay={0.1}>
             <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white">
-              New Arrivals
+              Fall Collection
             </h1>
           </EffectWrapper>
 
           <EffectWrapper delay={0.2}>
             <p className="text-sm text-slate-700 dark:text-slate-300 mt-2">
-              Curated modern essentials
+              Seasonal fall essentials
             </p>
           </EffectWrapper>
 
@@ -103,7 +89,7 @@ const NewArrivals = () => {
       </div>
 
       {/* -------------------------------------- */}
-      {/* FILTER BAR */}
+      {/* FILTER BAR (AYNI COMPONENT) */}
       {/* -------------------------------------- */}
       <div className="px-4 sticky top-20 z-40 mt-4">
         <div className="max-w-[1280px] mx-auto">
@@ -139,7 +125,7 @@ const NewArrivals = () => {
             </div>
           ) : finalList.length === 0 ? (
             <p className="text-center text-slate-600 dark:text-slate-400 mt-20">
-              No products found.
+              No fall products found.
             </p>
           ) : (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-10">
@@ -158,4 +144,4 @@ const NewArrivals = () => {
   );
 };
 
-export default NewArrivals;
+export default FallCollection;

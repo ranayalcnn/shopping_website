@@ -1,21 +1,24 @@
 import React from 'react';
 import { FiSun, FiMoon } from 'react-icons/fi';
-import useDarkMode from '../hooks/useDarkMode'; // Hook'u içe aktar
+import useDarkMode from '../hooks/useDarkMode';
 
 const DarkModeToggle = () => {
-    // Hook'u kullanarak temayı ve değiştirme fonksiyonunu al
-    const [themeMode, toggleTheme] = useDarkMode(); 
+  const [theme, toggleTheme] = useDarkMode();
 
-    return (
-        <button
-            onClick={toggleTheme}
-            title={themeMode === 'light' ? 'Change to Bright Mode' : 'Change to Dark Mode'}
-            className="p-2 rounded-full hover:bg-white/20 transition-colors"
-        >
-            {/* Geçerli moda göre ikon göster */}
-            {themeMode === 'dark' ? <FiSun className="text-xl" /> : <FiMoon className="text-xl" />}
-        </button>
-    );
+  return (
+    <button
+      onClick={toggleTheme}
+      className="
+        p-2 rounded-full 
+        bg-slate-100 dark:bg-slate-800
+        text-slate-800 dark:text-slate-200
+        hover:bg-slate-200 dark:hover:bg-slate-700
+        transition-colors shadow
+      "
+    >
+      {theme === "dark" ? <FiSun className="text-xl" /> : <FiMoon className="text-xl" />}
+    </button>
+  );
 };
 
 export default DarkModeToggle;
